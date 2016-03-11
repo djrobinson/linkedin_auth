@@ -3,13 +3,12 @@
 module.exports = {
 
   development: {
-    client: 'sqlite3',
-    connection: 'postgres://localhost/brewpubs'
+    client: 'pg',
+    connection: 'postgres://localhost/linkedin_auth'
   },
-
   production: {
-    client: 'postgresql',
-    connection: process.env.DATABASE_URL
+    client: 'pg',
+    connection: process.env.DATABASE_URL + '?ssl=true'
   }
 
 };

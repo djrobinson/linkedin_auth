@@ -4,7 +4,7 @@ module.exports = {
 
   development: {
     client: 'pg',
-    connection: 'postgres://localhost/social_auth'
+    connection: 'postgres://localhost/linkedin_auth'
   },
 
   production: {

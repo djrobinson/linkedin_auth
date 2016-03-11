@@ -12,7 +12,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var swig = require('swig');
-
+var knex = require('./db/knex');
 // *** routes *** //
 var routes = require('./routes/index.js');
 var auth = require('./routes/auth.js');
@@ -50,10 +50,24 @@ passport.use(new LinkedInStrategy({
   clientID: process.env.LINKEDIN_API_KEY,
   clientSecret: process.env.LINKEDIN_SECRET_KEY,
   callbackURL: "http://localhost:5000/auth/linkedin/callback",
-  state: true
+  state: true,
+  scope: ['r_emailaddress', 'r_basicprofile']
 }, function(accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-    return done(null, { id: profile.id, displayName: profile.displayName });
+    knex('users').select().where('linkedin_id', profile.id).then(function(data){
+      console.log("Data is ", data);
+      if (data.length){
+        console.log("some datalkjaksldfjlskdjf");
+        process.nextTick(function () {
+        return done(null, { id: profile.id, displayName: profile.displayName, email: profile.emails, avatar_url: profile.photos });
+        });
+      } else {
+        console.log("inserting!!!!!");
+        knex('users').insert({linkedin_id: profile.id, email: profile.emails[0].value, preffered_name: profile.displayName, last_name: profile.displayName, avatar_url: profile.photos[0].value }).then(function(data){
+          process.nextTick(function () {
+          return done(null, { id: profile.id, displayName: profile.displayName, email: profile.emails, avatar_url: profile.photos });
+          });
+        });
+      }
   });
 }));
 
